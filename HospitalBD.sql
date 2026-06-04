@@ -9,3 +9,16 @@ GO
 
 create database HospitalDB --Creacion de la base de datos.
 GO
+
+use HospitalDB
+GO
+
+--Creamos los schemas
+Create schema Personal
+GO
+
+Create schema Pacientes
+GO
+
+Create schema Atencion
+GO
