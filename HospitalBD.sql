@@ -1,9 +1,6 @@
 --Modulo I
 use master
 GO
-
-Alter database HospitalDB set single_user with rollback immediate
-GO
 	
 create database HospitalDB --Creacion de la base de datos.
 GO
@@ -33,9 +30,18 @@ Create table Pacientes.Pacientes
 	Genero char(1) not null,
 	FechaRegistro datetime not null default getdate(),
 
-	Constraint PK_Pacientes_Pacientes_IdPaciente primary key (IdPaciente)
-	Constraint UQ_Pacientes_Pacientes_Email unique (Email)
+	Constraint PK_Pacientes_Pacientes_IdPaciente primary key (IdPaciente),
+	Constraint UQ_Pacientes_Pacientes_Email unique (Email),
 	Constraint CHK_Pacientes_Pacientes_Edad check (Edad >= 0 and Edad <= 120)
+)
+GO
+
+Create table Personal.Especialidades
+(
+	IdEspecialidad int identity(1,1),
+	Nombre nvarchar(50) not null,
+
+	Constraint PK_Personal_Especialidades_IdEspecialidad primary key (IdEspecialidad)
 )
 GO
 
@@ -49,25 +55,17 @@ Create table Personal.Medicos
 	Edad int not null,
 	Salario decimal(18,2) not null,
 
-	Constraint PK_Personal_Medicos_IdMedico primary key (IdMedico)
-	Constraint UQ_Personal_Medicos_Email unique (Email)
-	Constraint CHK_Personal_Medicos_Salario check (Salario >= 0)
+	Constraint PK_Personal_Medicos_IdMedico primary key (IdMedico),
+	Constraint UQ_Personal_Medicos_Email unique (Email),
+	Constraint CHK_Personal_Medicos_Salario check (Salario >= 0),
 	Constraint FK_Personal_Medicos_Especialidad foreign key (Especialidad) references Personal.Especialidades(Nombre)
 )
 GO
 
-Create table Personal.Especialidades
-(
-	IdEspecialidad int identity(1,1),
-	Nombre nvarchar(50) not null
-
-	Constraint PK_Personal_Especialidades_IdEspecialidad primary key (IdEspecialidad)
-)
-GO
 
 Create table Atencion.Citas
 (
-	IdCita int identity(1,1) primary key,
+	IdCita int identity(1,1),
 	IdPaciente int not null,
 	IdMedico int not null,
 	FechaCita datetime not null,
@@ -82,9 +80,10 @@ GO
 Create table Atencion.Habitaciones
 (
 	IdHabitacion int identity(1,1),
+	IdPaciente int not null,
 	NumeroHabitacion int not null,
 	TipoHabitacion nvarchar(50) not null,
-	Estado varchar(20) not null
+	Estado varchar(20) not null,
 
 	Constraint PK_Atencion_Habitaciones_IdHabitacion primary key (IdHabitacion),
 	Constraint FK_Atencion_Habitaciones_IdPaciente foreign key (IdPaciente) references Pacientes.Pacientes(IdPaciente)
@@ -93,7 +92,7 @@ GO
 
 Create table Atencion.Tratamientos
 (
-	IdTratamiento int identity(1,1) primary key,
+	IdTratamiento int identity(1,1),
 	IdPaciente int not null,
 	IdMedico int not null,
 	Descripcion nvarchar(255) not null,
@@ -102,15 +101,17 @@ Create table Atencion.Tratamientos
 
 	Constraint PK_Atencion_Tratamientos_IdTratamiento primary key (IdTratamiento),
 	Constraint FK_Atencion_Tratamientos_IdPaciente foreign key (IdPaciente) references Pacientes.Pacientes(IdPaciente),
+	Constraint FK_Atencion_Tratamientos_IdMedico foreign key (IdMedico) references Personal.Medicos(IdMedico)
 	)
 GO
 
 Create table Atencion.Medicamentos 
 (
 	IdMedicamento int identity(1,1),
+	IdTratamiento int not null,
 	Nombre nvarchar(50) not null,
 	Dosis varchar(20) not null,
-	Frecuencia varchar(20) not null
+	Frecuencia varchar(20) not null,
 
 	Constraint PK_Atencion_Medicamentos_IdMedicamento primary key (IdMedicamento),
 	Constraint FK_Atencion_Medicamentos_IdTratamiento foreign key (IdTratamiento) references Atencion.Tratamientos(IdTratamiento)
@@ -121,5 +122,31 @@ GO
 Modulo II
 Agrego las restricciones.
 */
+
+/*
+Modulo III
+Agrego los alter table.
+*/
+Alter table Pacientes.Pacientes add telefono varchar(20) null,
+Alter table Pacientes.Pacientes add direccion nvarchar(255) null, 
+Alter table Pcientes.Pacientes add tipoSangre varchar(3) null,
+
+Alter table Pacientes.Pacientes alter column nombre nvarchar(100) not null,
+Alter table Pacientes.Pacientes alter column direccion nvarchar(255) null,
+
+
+Alter table Personal.Medicos add Experiencia int null,
+Alter table Personal.Medicos add Turno nvarchar(20) null,
+Alter table Personal.Medicos add Observaciones nvarchar(max) null,
+
+Alter table Personal.Medicos drop column Observaciones,
+
+
+Alter table Atencion.Citas add Estado nvarchar(20) null,
+Alter table Atencion.Citas add CostoConsulta int null,
+
+Alter table Atencion.Citas alter column CostoConsulta decimal(10,2) null,
+Alter table Atencion.Habitaciones add Disponibilidad nvarchar(20) null,
+GO
 
 
